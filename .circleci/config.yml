@@ -1,0 +1,17 @@
+version: 2.1
+
+jobs:
+  build:
+    working_directory: /go/src/github.com/czifro/go-templates
+    environment:
+      TEST_RESULTS: /tmp/test-results
+    docker:
+      - image: circleci/golang:1.17
+    steps:
+      - checkout
+      - run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.44.0
+          golangci-lint run ./...
+      - run: go vet ./...
+      - run: go test ./...
+
