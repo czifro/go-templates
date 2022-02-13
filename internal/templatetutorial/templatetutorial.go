@@ -3,6 +3,7 @@ package templatetutorial
 
 import (
 	"io"
+	"log"
 	"os"
 	"text/template"
 )
@@ -11,8 +12,8 @@ type TemplateFile string
 
 const (
 	ex01 TemplateFile = "template-impls/ex01.tpl"
-	ex02 TemplateFile = "template-impls/ex02.tpl"
-	ex03 TemplateFile = "template-impls/ex03.tpl"
+	//ex02 TemplateFile = "template-impls/ex02.tpl"
+	//ex03 TemplateFile = "template-impls/ex03.tpl"
 )
 
 func loadAndRender(templateFile TemplateFile, data interface{}, output io.Writer) error {
@@ -25,5 +26,8 @@ func loadAndRender(templateFile TemplateFile, data interface{}, output io.Writer
 
 // Example01 runs the first example from the tutorial
 func Example01() {
-	loadAndRender(ex01, nil, os.Stdout)
+	err := loadAndRender(ex01, nil, os.Stdout)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
