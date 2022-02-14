@@ -2,7 +2,6 @@
 package templatetutorial
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -58,7 +57,7 @@ func (t *TemplateTutorial) LoadDefaultTemplates() error {
 func (t *TemplateTutorial) ExecuteExample(ex string, output io.Writer) error {
 	example, ok := t.examples[ex]
 	if !ok {
-		return errors.New(fmt.Sprintf("Could not find example %v", ex))
+		return fmt.Errorf("Could not find example %v", ex)
 	}
 	tmpls := example.template.Templates()
 	for i := range example.data {
