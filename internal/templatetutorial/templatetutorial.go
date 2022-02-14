@@ -59,10 +59,12 @@ func (t *TemplateTutorial) ExecuteExample(ex string, output io.Writer) error {
 	if !ok {
 		return fmt.Errorf("Could not find example %v", ex)
 	}
-	tmpls := example.template.Templates()
-	for i := range example.data {
-		tmpl := tmpls[i]
-		if err := tmpl.Execute(output, example.data[i]); err != nil {
+	for i, tmpl := range example.template.Templates() {
+		var data interface{}
+		if i < len(example.data) {
+			data = example.data[i]
+		}
+		if err := tmpl.Execute(output, data); err != nil {
 			return err
 		}
 	}

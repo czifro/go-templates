@@ -20,7 +20,7 @@ func TestLoader(t *testing.T) {
 		{"Example01_EmptyString", "ex01.tpl", []interface{}{""}, "Hi \n\nYou are are welcome to this tutorial\n", true},
 		{"Example01_String", "ex01.tpl", []interface{}{"Samus"}, "Hi Samus\n\nYou are are welcome to this tutorial\n", true},
 		{"Example02_NoData", "ex02/*", []interface{}{nil, nil}, "Hi <no value>\n\nThis is ex02/temp01\nHi <no value>\n\nThis is ex02/temp02\n", true},
-		{"Example02_SingleString", "ex02/*", []interface{}{"Scorpion"}, "Hi Scorpion\n\nThis is ex02/temp01\n", true},
+		{"Example02_SingleString", "ex02/*", []interface{}{"Scorpion"}, "Hi Scorpion\n\nThis is ex02/temp01\nHi <no value>\n\nThis is ex02/temp02\n", true},
 		{"Example02_MultiString", "ex02/*", []interface{}{"Samus", "Metroid"}, "Hi Samus\n\nThis is ex02/temp01\nHi Metroid\n\nThis is ex02/temp02\n", true},
 	}
 	subject := New("")
