@@ -2,32 +2,79 @@
 package templatetutorial
 
 import (
+	"errors"
+	"fmt"
 	"io"
-	"log"
 	"os"
+	"strings"
 	"text/template"
 )
 
-type TemplateFile string
+type TemplateTutorial struct {
+	rootDir  string
+	examples map[string]ExampleTemplate
+}
 
-const (
-	ex01 TemplateFile = "template-impls/ex01.tpl"
-	//ex02 TemplateFile = "template-impls/ex02.tpl"
-	//ex03 TemplateFile = "template-impls/ex03.tpl"
-)
+type ExampleTemplate struct {
+	template *template.Template
+	data     []interface{}
+}
 
-func loadAndRender(templateFile TemplateFile, data interface{}, output io.Writer) error {
-	tmp, err := template.ParseFiles(string(templateFile))
+func New(root string) *TemplateTutorial {
+	return &TemplateTutorial{
+		rootDir:  root,
+		examples: make(map[string]ExampleTemplate),
+	}
+}
+
+func (t *TemplateTutorial) LoadTemplate(templateName string, data []interface{}) error {
+	parse := func(templateFile string) (*template.Template, error) {
+		if strings.HasSuffix(string(templateFile), "*") {
+			return template.ParseGlob(string(templateFile))
+		}
+		return template.ParseFiles(string(templateFile))
+	}
+	tf := t.rootDir + "tmpls/" + templateName
+	tmp, err := parse(tf)
 	if err != nil {
 		return err
 	}
-	return tmp.Execute(output, data)
+	t.examples[templateName] = ExampleTemplate{template: tmp, data: data}
+	return nil
 }
 
-// Example01 runs the first example from the tutorial
-func Example01() {
-	err := loadAndRender(ex01, nil, os.Stdout)
-	if err != nil {
-		log.Fatalln(err)
+func (t *TemplateTutorial) LoadDefaultTemplates() error {
+	data := []interface{}{nil}
+	if err := t.LoadTemplate("ex01.tpl", data); err != nil {
+		return err
 	}
+	data = []interface{}{"Frodo", "Sam"}
+	if err := t.LoadTemplate("ex02/*", data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *TemplateTutorial) ExecuteExample(ex string, output io.Writer) error {
+	example, ok := t.examples[ex]
+	if !ok {
+		return errors.New(fmt.Sprintf("Could not find example %v", ex))
+	}
+	tmpls := example.template.Templates()
+	for i := range example.data {
+		tmpl := tmpls[i]
+		if err := tmpl.Execute(output, example.data[i]); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *TemplateTutorial) ExecuteAll() error {
+	for k := range t.examples {
+		if err := t.ExecuteExample(k, os.Stdout); err != nil {
+			return err
+		}
+	}
+	return nil
 }
