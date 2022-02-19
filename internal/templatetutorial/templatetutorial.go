@@ -4,7 +4,9 @@ package templatetutorial
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -59,11 +61,16 @@ func (t *TemplateTutorial) ExecuteExample(ex string, output io.Writer) error {
 	if !ok {
 		return fmt.Errorf("Could not find example %v", ex)
 	}
-	for i, tmpl := range example.template.Templates() {
+	tmpls := example.template.Templates()
+	sort.SliceStable(tmpls, func(i, j int) bool {
+		return tmpls[i].Name() < tmpls[j].Name()
+	})
+	for i, tmpl := range tmpls {
 		var data interface{}
 		if i < len(example.data) {
 			data = example.data[i]
 		}
+		log.Println(tmpl.ParseName)
 		if err := tmpl.Execute(output, data); err != nil {
 			return err
 		}
